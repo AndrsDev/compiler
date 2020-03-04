@@ -1,1 +1,2 @@
-# Lexical-Analyzer
+# Lex
+Andrés Sanabria
