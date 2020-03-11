@@ -1,2 +1,2 @@
-# Lex
+# Sintax Compiler
 Andrés Sanabria
