@@ -1,17 +1,19 @@
 import 'dart:io';
 import 'dart:core';
 import 'dart:collection';
+import 'node.dart';
 import 'token.dart';
 import 'label.dart';
 import 'num.dart';
 import 'word.dart';
 
 
-class LexicalAnalyzer {
+class Compiler {
 
   HashMap words = HashMap();
   int index = 0;
   int line = 1;
+  String text;
   String char = ' ';
   String digits = "0123456789";
   String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -20,24 +22,46 @@ class LexicalAnalyzer {
     words[word.lexeme] = word;
   }
 
-  LexicalAnalyzer() {
+  Compiler(String text) {
+    this.text = text;
     reserve(Word(Label.TRUE, "true"));
     reserve(Word(Label.FALSE, "false"));
   }
 
-  read(String text){
-    if(this.index < text.length){
-      this.char = text[index];
+  bool _isEndOfFile(){
+    return this.index >= this.text.length;
+  }
+
+  _read(){
+    if(!_isEndOfFile()){
+      this.char = this.text[index];
       index++;
     } else {
       this.char = "#EOF";
     } 
   }
 
-  Token explore(String text) {
+  //Sintax analyzer
+  Node execute(Node node){
+    if(_isEndOfFile()){
+      return node;
+    }
 
-    for (int i = index; i < text.length; i++) {
-      read(text);
+    Token token = _explore();
+    node.children.add(
+      Node(
+        value: token,
+        children: List(),
+      )
+    );
+    return execute(node);
+  }
+
+  //Lexical analyzer
+  Token _explore() {
+
+    for (int i = index; i < this.text.length; i++) {
+      _read();
       if(this.char == ' ' || this.char =='\t') continue;
       else if (this.char == '\n') line++;
       else break;
@@ -47,7 +71,7 @@ class LexicalAnalyzer {
       int v = 0;
       do {
         v = 10 * v + this.char.codeUnitAt(0);
-        read(text);
+        _read();
       } while (digits.contains(this.char));
 
       if (this.char == "#EOF" || this.char == ' '){
@@ -61,7 +85,7 @@ class LexicalAnalyzer {
       String buffer = "";
       do {
         buffer+= this.char;
-        read(text);
+        _read();
       } while (letters.contains(this.char) || digits.contains(this.char));
 
       Word w = words[buffer];
@@ -78,18 +102,23 @@ class LexicalAnalyzer {
 }
 
 
+
+
+
 Future<void> main() async {
   try{
-    LexicalAnalyzer analyzer = LexicalAnalyzer();
-    String expression = stdin.readLineSync();
-    Token token = analyzer.explore(expression);
-    print("\n");
+    File code = File('code.py');
+    String content = await code.readAsString();
+    Compiler compiler = Compiler(content);
+    Node tree = compiler.execute(Node(
+      value: null,
+      children: List(),
+    ));
 
-    if(token is Num){
-      print("A number was found.");
-    } else if (token is Word) {
-      print("An identifier was found.");
-    }
+    print(content);
+    print(tree.children.map((node) => node.value));
+
+    print("\n");
   } catch (e){
     print(e);
   }
