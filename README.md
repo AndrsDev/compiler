@@ -1,2 +1,0 @@
-# Sintax Compiler
-Andrés Sanabria
