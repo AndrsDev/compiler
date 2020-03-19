@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:core';
 import 'dart:collection';
-import 'node.dart';
-import 'token.dart';
-import 'label.dart';
-import 'num.dart';
-import 'word.dart';
+import 'utils/node.dart';
+import 'utils/token.dart';
+import 'utils/label.dart';
+import 'utils/num.dart';
+import 'utils/word.dart';
 
 
 class Compiler {
@@ -15,6 +15,9 @@ class Compiler {
   int line = 1;
   String text;
   String char = ' ';
+
+
+  String simbols = "-+*/^=";
   String digits = "0123456789";
   String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -24,8 +27,8 @@ class Compiler {
 
   Compiler(String text) {
     this.text = text;
-    reserve(Word(Label.TRUE, "true"));
-    reserve(Word(Label.FALSE, "false"));
+    reserve(Word(Label.TRUE, "true", "true"));
+    reserve(Word(Label.FALSE, "false", "false"));
   }
 
   bool _isEndOfFile(){
@@ -41,20 +44,34 @@ class Compiler {
     } 
   }
 
-  //Sintax analyzer
-  Node execute(Node node){
-    if(_isEndOfFile()){
-      return node;
+  void insert(Node node, Token token){
+    if(node.right == null){
+      if(simbols.contains(token.value)){
+        node.left = Node(token: node.token);
+        node.token = token;
+      } else{
+        node.right = Node(token: token);
+      }
+    } else {
+      insert(node.right, token);
     }
 
+  }
+
+  //Sintax analyzer
+  Node execute(){
+
+    //Get the first initial token
     Token token = _explore();
-    node.children.add(
-      Node(
-        value: token,
-        children: List(),
-      )
-    );
-    return execute(node);
+    Node tree = Node(token: token);
+
+    //Create the tree with the rest of tokens.
+    while(!_isEndOfFile()){
+      Token token = _explore();
+      insert(tree, token);
+    }
+
+    return tree;
   }
 
   //Lexical analyzer
@@ -68,14 +85,16 @@ class Compiler {
     }
 
     if(digits.contains(this.char)){
-      int v = 0;
+      int n = 0;
+      String v = "";
       do {
-        v = 10 * v + this.char.codeUnitAt(0);
+        v += this.char;
+        n = 10 * n + this.char.codeUnitAt(0);
         _read();
       } while (digits.contains(this.char));
 
       if (this.char == "#EOF" || this.char == ' '){
-        return Num(v);
+        return Num(v, n);
       } else if (letters.contains(this.char)){
         throw 'Error: Invalid number at line $line. Expected whitespace at pos ${index}';
       }
@@ -90,12 +109,12 @@ class Compiler {
 
       Word w = words[buffer];
       if(w != null) return w;
-      w = Word(Label.ID, buffer);
+      w = Word(Label.ID, buffer, buffer);
       words[buffer] = w;
       return w; 
     }
 
-    Token t = Token(this.char.codeUnitAt(0));
+    Token t = Token(this.char.codeUnitAt(0), this.char);
     this.char = ' ';
     return t;
   }
@@ -110,13 +129,9 @@ Future<void> main() async {
     File code = File('code.py');
     String content = await code.readAsString();
     Compiler compiler = Compiler(content);
-    Node tree = compiler.execute(Node(
-      value: null,
-      children: List(),
-    ));
-
-    print(content);
-    print(tree.children.map((node) => node.value));
+    Node tree = compiler.execute();
+    print(content + "\n");
+    print("Tree: ${Node.inorder(tree)}");
 
     print("\n");
   } catch (e){
