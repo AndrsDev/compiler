@@ -17,3 +17,6 @@ Este es un analizador sitnáctico. Su objetivo es construir un árbol sintáctic
 
 ## Autor
 Andrés Sanabria
+
+## License
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/AndrsDev/compiler/blob/feature/taller2/LICENSE)
