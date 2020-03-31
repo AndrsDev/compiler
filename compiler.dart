@@ -126,11 +126,11 @@ class Compiler {
 
 Future<void> main() async {
   try{
-    File code = File('code.py');
-    String content = await code.readAsString();
-    Compiler compiler = Compiler(content);
+    File file = File('code.py');
+    String code = await file.readAsString();
+    Compiler compiler = Compiler(code);
     Node tree = compiler.execute();
-    print(content + "\n");
+    print(code + "\n");
     print("Tree: ${Node.inorder(tree)}");
 
     print("\n");
