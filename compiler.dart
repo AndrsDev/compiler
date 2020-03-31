@@ -131,7 +131,7 @@ Future<void> main() async {
     Node tree = compiler.execute();
     print(code + "\n");
 
-    tree.herarchy("");
+    tree.hierarchy("");
 
     print("");
     print("Inorder: ${Node.inorder(tree)}");

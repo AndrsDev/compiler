@@ -28,7 +28,7 @@ class Node {
     return postorder(node.left) + postorder(node.right) + node.token.value + " " ;    
   }
 
-  void herarchy(String prefix){
+  void hierarchy(String prefix){
     String formattedPrefix = " ";
 
     for (var i = 1; i < prefix.length / 2; i++) {
@@ -39,7 +39,7 @@ class Node {
 
     print('$formattedPrefix${this.token.value}');
 
-    if(this.left != null) left.herarchy(prefix + "├╴");
-    if(this.right != null) right.herarchy(prefix + "└╴");
+    if(this.left != null) left.hierarchy(prefix + "├╴");
+    if(this.right != null) right.hierarchy(prefix + "└╴");
   }
 }
