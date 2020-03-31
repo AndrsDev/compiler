@@ -58,7 +58,7 @@ class Compiler {
 
   }
 
-  //Sintax analyzer
+  ///Sintax analyzer
   Node execute(){
 
     //Get the first initial token
@@ -74,9 +74,8 @@ class Compiler {
     return tree;
   }
 
-  //Lexical analyzer
+  ///Lexical analyzer
   Token _explore() {
-
     for (int i = index; i < this.text.length; i++) {
       _read();
       if(this.char == ' ' || this.char =='\t') continue;
@@ -131,7 +130,13 @@ Future<void> main() async {
     Compiler compiler = Compiler(code);
     Node tree = compiler.execute();
     print(code + "\n");
-    print("Tree: ${Node.inorder(tree)}");
+
+    tree.herarchy("");
+
+    print("");
+    print("Inorder: ${Node.inorder(tree)}");
+    print("Preorder: ${Node.preorder(tree)}");
+    print("Postorder: ${Node.postorder(tree)}");
 
     print("\n");
   } catch (e){
