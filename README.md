@@ -13,7 +13,7 @@ Este es un analizador sitnáctico. Su objetivo es construir un árbol sintáctic
 4. Ejecutar el comando `dart compiler.dart`
 
 ## Ejemplo
-
+![Imagen de ejemplo](https://github.com/AndrsDev/compiler/blob/feature/taller2/screenshots/Screen%20Shot%202020-03-31%20at%209.46.00%20AM.png)
 
 ## Autor
 Andrés Sanabria
